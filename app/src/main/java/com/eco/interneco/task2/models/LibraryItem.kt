@@ -1,6 +1,9 @@
 package com.eco.interneco.task2.models
 
-
+enum class TypeLibraryItem {
+    BOOK,
+    MAGAZINE,
+}
 abstract class LibraryItem(
     open val id: Long,
     open val name: String,

@@ -12,9 +12,9 @@ class Guest {
             val choose = readlnOrNull()?.toIntOrNull()
             println()
             when (choose) {
-                1 -> manager.showAllBooks()
-                2 -> manager.searchBook()
-                3 -> manager.borrowBook()
+                1 -> manager.showAllProduct() // done
+                2 -> manager.searchProduct() // done
+                3 -> manager.borrowProduct() // done
                 4 -> {
                     println("Returning to main menu...")
                     return

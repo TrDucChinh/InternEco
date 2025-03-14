@@ -1,80 +1,129 @@
 package com.eco.interneco.task2.libsystem
 
+import LibrarySystem
+import com.eco.interneco.task2.models.Magazine
+import User
+import addBorrowedProduct
 import com.eco.interneco.task2.IActions
 import com.eco.interneco.task2.models.Book
 import com.eco.interneco.task2.models.CategoryBook
+import com.eco.interneco.task2.models.LibraryItem
 import com.eco.interneco.task2.models.TypeBook
-import com.eco.interneco.task2.models.User
+import com.eco.interneco.task2.models.TypeMagazine
 import com.eco.interneco.task2.utlis.Helper
 import com.eco.interneco.task2.utlis.Menu
-import com.eco.interneco.task2.utlis.addBorrowedBook
-import com.eco.interneco.task2.utlis.formatBorrowedBooks
-import com.eco.interneco.task2.utlis.formatDisplay
+import formatBorrowed
+import formatDisplay
 
 
 class LibraryManager : IActions {
-    override fun addBook() {
-        inputNewBook()
+    override fun addProduct() {
+        inputNewProduct()
+//        inputNewBook()
     }
 
-    override fun showAllBooks() {
-        LibrarySystem.booksList.forEach {
-            println(it.formatDisplay())
+    override fun showAllProduct() {
+//        LibrarySystem.booksList.forEach {
+//            println(it.formatDisplay())
+////            println(it.getItemType())
+//        }
+        LibrarySystem.productList.forEach {
+            when (it) {
+                is Book -> println(it.formatDisplay())
+                is Magazine -> println(it.formatDisplay())
+            }
         }
     }
 
-    override fun updateBook() {
-        showAllBooks()
-        inputUpdateBook()
+    private fun showAllBook() {
+        LibrarySystem.productList.forEach {
+            if (it is Book) {
+                println(it.formatDisplay())
+            }
+        }
     }
 
-    override fun deleteBook() {
-        showAllBooks()
-        inputDeleteBook()
+    private fun showAllMagazine() {
+        LibrarySystem.productList.forEach {
+            if (it is Magazine) {
+                println(it.formatDisplay())
+            }
+        }
+    }
+
+    override fun updateProduct() {
+//        inputUpdateBook()
+        inputUpdateProduct()
+    }
+
+    override fun deleteProduct() {
+        showAllProduct()
+        inputDeleteProduct()
     }
 
     override fun showBorrower() {
         println("Borrower list:")
         LibrarySystem.borrowerList.forEach {
-            println(it.formatBorrowedBooks())
+            println("\nName: ${it.name}")
+            println(it.formatBorrowed())
         }
     }
 
 
-    override fun borrowBook() {
-        showAllBooks()
+    override fun borrowProduct() {
+        showAllProduct()
         while (true) {
-            print("Enter book id to borrow: ")
+            print("Enter product id to borrow: ")
             val id = readln().toLongOrNull()
             if (id != null) {
-                val book = findBookById(id)
-                if (book != null) {
-                    if (book.borrowed) {
-                        println("Book is borrowed. Please choose another book.")
+                val product = findProductById(id)
+                if (product != null) {
+                    if (product.borrowed) {
+                        println("Product is borrowed. Please choose another product.")
                     } else {
                         print("Enter borrower name: ")
                         val borrowerName = readln()
-                        LibrarySystem.booksList.replaceAll {
-                            if (it.id == book.id) {
-                                it.copy(borrowed = true)
-                            } else {
-                                it
+                        LibrarySystem.productList.replaceAll {
+                            when (it) {
+                                is Book -> {
+                                    if (it.id == product.id) {
+                                        it.copy(borrowed = true)
+                                    } else {
+                                        it
+                                    }
+                                }
+
+                                is Magazine -> {
+                                    if (it.id == product.id) {
+                                        it.copy(borrowed = true)
+                                    } else {
+                                        it
+                                    }
+                                }
+
+                                else -> it
                             }
                         }
-                        LibrarySystem.borrowedBooksList.add(book.copy(borrowed = true))
+                        LibrarySystem.borrowedProductList.add(
+                            when (product) {
+                                is Book -> product.copy(borrowed = true)
+                                is Magazine -> product.copy(borrowed = true)
+                                else -> product
+                            }
+                        )
                         val newUser = User(
                             LibrarySystem.borrowerList.size.toLong() + 1,
                             borrowerName,
                             mutableListOf()
                         )
-                        newUser.addBorrowedBook(book)
+                        newUser.addBorrowedProduct(product)
                         LibrarySystem.borrowerList.add(newUser)
 
-                        println("Book borrowed successfully.")
+                        println("Product borrowed successfully.")
                     }
                     break
                 } else {
-                    println("Book not found. Please enter again.")
+                    println("Product not found. Please enter again.")
                 }
             } else {
                 println("Invalid id. Please enter again.")
@@ -84,19 +133,23 @@ class LibraryManager : IActions {
     }
 
 
-    override fun searchBook() {
+    override fun searchProduct() {
         while (true) {
-            print("Enter book name to search: ")
+            print("Enter product name to search: ")
             val query = readln()
             if (query.isEmpty()) {
                 println("Query is empty. Please enter again.")
             } else {
-                val result = LibrarySystem.booksList.filter { it.name.contains(query, ignoreCase = true) }
+                val result =
+                    LibrarySystem.productList.filter { it.name.contains(query, ignoreCase = true) }
                 if (result.isEmpty()) {
-                    println("No book found.")
+                    println("No product found.")
                 } else {
                     result.forEach {
-                        println(it.formatDisplay())
+                        when (it) {
+                            is Book -> println(it.formatDisplay())
+                            is Magazine -> println(it.formatDisplay())
+                        }
                     }
                 }
                 break
@@ -107,12 +160,29 @@ class LibraryManager : IActions {
 
 
     override fun showBorrowedBooks() {
-        println("Borrowed books:")
-        LibrarySystem.borrowedBooksList.forEach {
-            println(it.formatDisplay())
+        println("Borrowed product:")
+        LibrarySystem.borrowedProductList.forEach {
+            when (it) {
+                is Book -> println(it.formatDisplay())
+                is Magazine -> println(it.formatDisplay())
+            }
         }
     }
 
+
+    private fun inputNewProduct() {
+        while (true) {
+            Menu.menuAddProduct()
+            val option = readln().toIntOrNull()
+            when (option) {
+                1 -> inputNewBook()
+                2 -> inputNewMagazine()
+                3 -> break
+                else -> println("Invalid option. Please enter again.")
+            }
+
+        }
+    }
 
     private fun inputNewBook() {
         print("Enter book name: ")
@@ -122,7 +192,7 @@ class LibraryManager : IActions {
         var category: Int?
         while (true) {
             print("\nEnter category: ")
-            Helper.showOptionCategory()
+            Helper.showOptionBookCategory()
             print("\nChoose option: ")
             category = readln().toIntOrNull()
             if (category in 1..CategoryBook.entries.size) break
@@ -133,17 +203,17 @@ class LibraryManager : IActions {
         var type: Int?
         while (true) {
             print("\nEnter type: ")
-            Helper.showOptionType()
+            Helper.showOptionBookType()
 
             print("\nChoose option: ")
             type = readln().toIntOrNull()
             if (type in 1..TypeBook.entries.size) break
             println("Invalid type. Please enter again.")
         }
-        LibrarySystem.booksList.add(
+        LibrarySystem.productList.add(
             // name Argument
             Book(
-                id = LibrarySystem.booksList.size.toLong(),
+                id = LibrarySystem.productList.size.toLong() + 1,
                 name = name,
                 author = author,
                 publishDate = publishYear,
@@ -154,18 +224,50 @@ class LibraryManager : IActions {
         )
     }
 
-    private fun inputDeleteBook() {
+    private fun inputNewMagazine() {
+        print("Enter magazine name: ")
+        val name = readln()
+        print("Enter publisher: ")
+        val publisher = readln()
+        print("Enter issue number: ")
+        val issueNumber = readln()
+        print("Enter publish year: ")
+        val publishYear = readln()
+        var type: Int?
         while (true) {
-            print("\nEnter book id to remove: ")
+            print("\nEnter type: ")
+            Helper.showOptionMagazineType()
+            print("\nChoose option: ")
+            type = readln().toIntOrNull()
+            if (type in 1..TypeMagazine.entries.size) break
+            println("Invalid type. Please enter again.")
+        }
+        LibrarySystem.productList.add(
+            Magazine(
+                id = LibrarySystem.productList.size.toLong() + 1,
+                name = name,
+                publishDate = publishYear,
+                borrowed = false,
+                type = TypeMagazine.entries[type!! - 1],
+                publisher = publisher,
+                issueNumber = issueNumber.toInt()
+            )
+        )
+
+    }
+
+    private fun inputDeleteProduct() {
+        while (true) {
+            print("\nEnter product id to remove: ")
             val id = readln().toLongOrNull()
             if (id != null) {
-                val book = findBookById(id)
-                if (book != null) {
-                    LibrarySystem.booksList.remove(book)
-                    println("Book removed successfully.")
+                val product = findProductById(id)
+                if (product != null) {
+                    LibrarySystem.productList.remove(product)
+                    println("Product removed successfully.")
                     break
                 } else {
-                    println("Book not found. Please enter again.")
+                    println("Product not found. Please enter again.")
                 }
             } else {
                 println("Invalid id. Please enter again.")
@@ -174,11 +276,12 @@ class LibraryManager : IActions {
     }
 
     private fun inputUpdateBook() {
+        showAllBook()
         while (true) {
             print("\nEnter book id to update: ")
             val id = readln().toLongOrNull()
             if (id != null) {
-                val book = findBookById(id)
+                val book = findProductById(id) as Book?
                 if (book != null) {
                     println("Book information: $book")
                     while (true) {
@@ -202,14 +305,73 @@ class LibraryManager : IActions {
         }
     }
 
-    private fun checkOption(option: Int, book: Book) {
+    private fun inputUpdateMagazine() {
+        showAllMagazine()
+        while (true) {
+            print("\nEnter magazine id to update: ")
+            val id = readln().toLongOrNull()
+            if (id != null) {
+                val magazine = findProductById(id) as Magazine?
+                if (magazine != null) {
+                    println("Magazine information: $magazine")
+                    while (true) {
+                        Menu.optionUpdateBook()
+                        val option = readln().toIntOrNull()
+                        if (option in 1..5) {
+                            checkOption(option!!, magazine)
+                            println("Magazine updated successfully.")
+                            break
+                        } else {
+                            println("Invalid option. Please enter again.")
+                        }
+                    }
+                    break
+                } else {
+                    println("Magazine not found. Please enter again.")
+                }
+            } else {
+                println("Invalid id. Please enter again.")
+            }
+        }
+    }
+
+    private fun inputUpdateProduct() {
+        while (true) {
+            Menu.menuUpdateProduct()
+            val option = readln().toIntOrNull()
+            when (option) {
+                1 -> inputUpdateBook()
+                2 -> inputUpdateMagazine()
+                3 -> break
+                else -> println("Invalid option. Please enter again.")
+            }
+        }
+    }
+
+    private fun checkOption(option: Int, product: LibraryItem) {
+        when (product) {
+            is Book -> {
+                checkOptionBook(option, product)
+            }
+
+            is Magazine -> {
+                checkOptionMagazine(option, product)
+            }
+        }
+    }
+
+    private fun checkOptionBook(option: Int, book: LibraryItem) {
         when (option) {
             1 -> {
                 print("Enter new name: ")
                 val name = readln()
-                LibrarySystem.booksList.replaceAll {
-                    if (it.id == book.id) {
-                        it.copy(name = name)
+                LibrarySystem.productList.replaceAll {
+                    if (it is Book) {
+                        if (it.id == book.id) {
+                            it.copy(name = name)
+                        } else {
+                            it
+                        }
                     } else {
                         it
                     }
@@ -219,9 +381,13 @@ class LibraryManager : IActions {
             2 -> {
                 print("Enter new author: ")
                 val author = readln()
-                LibrarySystem.booksList.replaceAll {
-                    if (it.id == book.id) {
-                        it.copy(author = author)
+                LibrarySystem.productList.replaceAll {
+                    if (it is Book) {
+                        if (it.id == book.id) {
+                            it.copy(author = author)
+                        } else {
+                            it
+                        }
                     } else {
                         it
                     }
@@ -231,9 +397,13 @@ class LibraryManager : IActions {
             3 -> {
                 print("Enter new publish year: ")
                 val publishYear = readln()
-                LibrarySystem.booksList.replaceAll {
-                    if (it.id == book.id) {
-                        it.copy(publishDate = publishYear)
+                LibrarySystem.productList.replaceAll {
+                    if (it is Book) {
+                        if (it.id == book.id) {
+                            it.copy(publishDate = publishYear)
+                        } else {
+                            it
+                        }
                     } else {
                         it
                     }
@@ -245,15 +415,19 @@ class LibraryManager : IActions {
                 var category: Int?
                 while (true) {
                     print("\nEnter new category: ")
-                    Helper.showOptionCategory()
+                    Helper.showOptionBookType()
                     print("\nChoose option: ")
                     category = readln().toIntOrNull()
                     if (category in 1..CategoryBook.entries.size) break
                     println("Invalid category. Please enter again.")
                 }
-                LibrarySystem.booksList.replaceAll {
-                    if (it.id == book.id) {
-                        it.copy(category = CategoryBook.entries[category!! - 1])
+                LibrarySystem.productList.replaceAll {
+                    if (it is Book) {
+                        if (it.id == book.id) {
+                            it.copy(category = CategoryBook.entries[category!! - 1])
+                        } else {
+                            it
+                        }
                     } else {
                         it
                     }
@@ -264,15 +438,19 @@ class LibraryManager : IActions {
                 var type: Int?
                 while (true) {
                     print("\nEnter new type: ")
-                    Helper.showOptionType()
+                    Helper.showOptionBookType()
                     print("\nChoose option: ")
                     type = readln().toIntOrNull()
                     if (type in 1..TypeBook.entries.size) break
                     println("Invalid type. Please enter again.")
                 }
-                LibrarySystem.booksList.replaceAll {
-                    if (it.id == book.id) {
-                        it.copy(type = TypeBook.entries[type!! - 1])
+                LibrarySystem.productList.replaceAll {
+                    if (it is Book) {
+                        if (it.id == book.id) {
+                            it.copy(type = TypeBook.entries[type!! - 1])
+                        } else {
+                            it
+                        }
                     } else {
                         it
                     }
@@ -285,7 +463,105 @@ class LibraryManager : IActions {
         }
     }
 
-    private fun findBookById(id: Long): Book? {
-        return LibrarySystem.booksList.find { it.id == id }
+    private fun checkOptionMagazine(option: Int, magazine: LibraryItem) {
+        when (option) {
+            1 -> {
+                print("Enter new name: ")
+                val name = readln()
+                LibrarySystem.productList.replaceAll {
+                    if (it is Magazine) {
+                        if (it.id == magazine.id) {
+                            it.copy(name = name)
+                        } else {
+                            it
+                        }
+                    } else {
+                        it
+                    }
+                }
+            }
+
+            2 -> {
+                print("Enter new publisher: ")
+                val publisher = readln()
+                LibrarySystem.productList.replaceAll {
+                    if (it is Magazine) {
+                        if (it.id == magazine.id) {
+                            it.copy(publisher = publisher)
+                        } else {
+                            it
+                        }
+                    } else {
+                        it
+                    }
+                }
+            }
+
+            3 -> {
+                print("Enter new issue number: ")
+                val issueNumber = readln()
+                LibrarySystem.productList.replaceAll {
+                    if (it is Magazine) {
+                        if (it.id == magazine.id) {
+                            it.copy(issueNumber = issueNumber.toInt())
+                        } else {
+                            it
+                        }
+                    } else {
+                        it
+                    }
+                }
+
+            }
+
+            4 -> {
+                print("Enter new publish year: ")
+                val publishYear = readln()
+                LibrarySystem.productList.replaceAll {
+                    if (it is Magazine) {
+                        if (it.id == magazine.id) {
+                            it.copy(publishDate = publishYear)
+                        } else {
+                            it
+                        }
+                    } else {
+                        it
+                    }
+                }
+
+            }
+
+            5 -> {
+                var type: Int?
+                while (true) {
+                    print("\nEnter new type: ")
+                    Helper.showOptionMagazineType()
+                    print("\nChoose option: ")
+                    type = readln().toIntOrNull()
+                    if (type in 1..TypeMagazine.entries.size) break
+                    println("Invalid type. Please enter again.")
+                }
+                LibrarySystem.productList.replaceAll {
+                    if (it is Magazine) {
+                        if (it.id == magazine.id) {
+                            it.copy(type = TypeMagazine.entries[type!! - 1])
+                        } else {
+                            it
+                        }
+                    } else {
+                        it
+                    }
+                }
+            }
+
+            else -> {
+                println("Invalid option. Please enter again.")
+            }
+        }
     }
+
+    private fun findProductById(id: Long): LibraryItem? {
+        return LibrarySystem.productList.find { it.id == id }
+    }
+
 }

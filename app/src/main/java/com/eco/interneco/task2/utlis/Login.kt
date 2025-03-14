@@ -1,8 +1,8 @@
 package com.eco.interneco.task2.utlis
 
+import LibrarySystem.Companion.countRePas
 import com.eco.interneco.task2.libsystem.Admin
-import com.eco.interneco.task2.libsystem.LibrarySystem
-import com.eco.interneco.task2.libsystem.LibrarySystem.Companion.countRePas
+
 
 
 object Login {

@@ -1,7 +1,9 @@
-package com.eco.interneco.task2.utlis
+
 
 import com.eco.interneco.task2.models.Book
-import com.eco.interneco.task2.models.User
+import com.eco.interneco.task2.models.LibraryItem
+import com.eco.interneco.task2.models.Magazine
+
 
 fun Book.formatDisplay(): String {
     return """
@@ -17,14 +19,41 @@ fun Book.formatDisplay(): String {
     """.trimIndent()
 }
 
-fun User.addBorrowedBook(book: Book) {
-    this.listBookBorrowed.add(book)
+fun Magazine.formatDisplay(): String {
+    return """
+        =================================
+        ID: $id
+        Title: $name
+        Published: $publishDate
+        Type: $type
+        Publisher: $publisher
+        Issue Number: $issueNumber
+        Status: ${if (borrowed) "Borrowed" else "Available"}
+        =================================
+    """.trimIndent()
 }
 
-fun User.formatBorrowedBooks(): String {
-    return if (listBookBorrowed.isEmpty()) {
-        "No books borrowed"
+fun User.addBorrowedProduct(item: LibraryItem) {
+    this.productBorrowedList.add(item)
+}
+
+fun User.formatBorrowed(): String {
+    return if (productBorrowedList.isEmpty()) {
+        "No product borrowed"
     } else {
-        listBookBorrowed.joinToString("\n") { it.formatDisplay() }
+        productBorrowedList.joinToString("\n") {
+            when (it) {
+                is Book -> {
+                    it.formatDisplay()
+                }
+
+                is Magazine -> {
+                    it.formatDisplay()
+                }
+                else -> {
+                    ""
+                }
+            }
+        }
     }
 }

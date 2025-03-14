@@ -2,12 +2,12 @@ package com.eco.interneco.task2
 
 // interface
 interface IActions {
-    fun addBook()
-    fun borrowBook()
-    fun updateBook()
-    fun searchBook()
-    fun showAllBooks()
+    fun addProduct()
+    fun borrowProduct()
+    fun updateProduct()
+    fun searchProduct()
+    fun showAllProduct()
     fun showBorrowedBooks()
-    fun deleteBook()
+    fun deleteProduct()
     fun showBorrower()
 }

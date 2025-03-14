@@ -1,5 +1,7 @@
 package com.eco.interneco.task2.utlis
 
+import com.eco.interneco.task2.models.TypeLibraryItem
+
 //Singleton class Menu
 object Menu {
     fun mainMenu() {
@@ -10,21 +12,21 @@ object Menu {
         print("Choose option: ")
     }
     fun guestMenu() {
-        println("\nGuest Menu")
+        println("\nGuest")
         println("1. Show all books")
-        println("2. Search book by title")
+        println("2. Search product by title")
         println("3. Borrow books")
         println("4. Exit")
         print("Choose option: ")
     }
     fun adminMenu() {
-        println("\nAdmin Menu")
-        println("1. Show all books")
-        println("2. Add new book")
-        println("3. Update book")
-        println("4. Delete book")
-        println("5. Search book by title")
-        println("6. Show borrowed books")
+        println("\nAdmin")
+        println("1. Show all products")
+        println("2. Add new product")
+        println("3. Update product")
+        println("4. Delete product")
+        println("5. Search product by title")
+        println("6. Show borrowed product")
         println("7. Show borrowers")
         println("8. Exit")
         print("Choose option: ")
@@ -38,10 +40,18 @@ object Menu {
         println("5. Update type")
         print("Choose option: ")
     }
-    fun menuBorrowBook(){
-        println("Choose option to borrow book:")
-        println("1. Borrow book")
-        println("2. Return book")
+
+    fun menuAddProduct(){
+        println("Choose option to add product:")
+        println(TypeLibraryItem.entries.joinToString("\n") { "${it.ordinal + 1}. ${it.name}" })
+        println("${TypeLibraryItem.entries.size + 1}. Exit")
+        print("Choose option: ")
+    }
+
+    fun menuUpdateProduct(){
+        println("Choose option to update product:")
+        println(TypeLibraryItem.entries.joinToString("\n") { "${it.ordinal + 1}. ${it.name}" })
+        println("${TypeLibraryItem.entries.size + 1}. Exit")
         print("Choose option: ")
     }
 }

@@ -12,13 +12,13 @@ class Admin {
             val choose = readlnOrNull()?.toIntOrNull()
             println()
             when (choose) {
-                1 -> manager.showAllBooks() // done
-                2 -> manager.addBook() // done
-                3 -> manager.updateBook() // done
-                4 -> manager.deleteBook() // done
-                5 -> manager.searchBook() // done
-                6 -> manager.showBorrowedBooks() //done
-                7 -> manager.showBorrower() //done
+                1 -> manager.showAllProduct() // done
+                2 -> manager.addProduct() // done
+                3 -> manager.updateProduct() // done
+                4 -> manager.deleteProduct() // done
+                5 -> manager.searchProduct() // done
+                6 -> manager.showBorrowedBooks() // done
+                7 -> manager.showBorrower() // done
                 8 -> {
                     println("Returning to main menu...")
                     return
